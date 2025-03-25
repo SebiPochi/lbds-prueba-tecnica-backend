@@ -1,0 +1,31 @@
+{
+  "name": "lbds-prueba-tecnica",
+  "version": "1.0.0",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "dev:turso": "tsc && node --watch --env-file=.env ./dist/server-turso.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@libsql/client": "^0.15.1",
+    "@types/cors": "^2.8.17",
+    "bcrypt": "^5.1.1",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "express": "4.21.2",
+    "jsonwebtoken": "^9.0.2",
+    "prettier": "^3.5.3",
+    "zod": "3.24.2"
+  },
+  "devDependencies": {
+    "@types/bcrypt": "^5.0.2",
+    "@types/cookie-parser": "^1.4.8",
+    "@types/express": "^5.0.1",
+    "@types/jsonwebtoken": "^9.0.9",
+    "typescript": "5.8.2"
+  }
+}

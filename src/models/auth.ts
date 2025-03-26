@@ -38,6 +38,12 @@ export class AuthModel implements IAuthModel {
       args: [uuid],
     })
 
+    // creo la row en tabla borrachosCuota, si es un asco
+    await turso.execute({
+      sql: 'INSERT INTO borrachosCuota (user_id, estaPago) VALUES (?, 0)',
+      args: [uuid],
+    })
+
     // TODO devolver usuario no id
     /*
     const newUser = (

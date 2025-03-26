@@ -49,7 +49,7 @@ export class AuthController {
         .cookie('access-token', token, {
           httpOnly: true,
         })
-        .send({ user })
+        .send({ token, user })
     } catch (err) {
       console.log((err as Error).message)
       res.status(500).send('Ocurrio un error en el servidor')

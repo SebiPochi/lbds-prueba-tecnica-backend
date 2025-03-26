@@ -12,11 +12,14 @@ export const turso = createClient({
 
 export class BorrachoModel implements IBorrachoModel {
   async getAll(): Promise<Borracho[]> {
-    const borrachos = (
-      await turso.execute(
-        'SELECT usuarios.id, usuarios.nombre, usuarios.apellido, usuarios.email, usuarios.password, usuarios.type, borrachosPartidos.partidosAnotado FROM usuarios JOIN borrachosPartidos  ON usuarios.id = borrachosPartidos.user_id WHERE usuarios.type=0',
-      )
-    ).rows as unknown as Borracho[]
+    let query =
+      'SELECT usuarios.id, usuarios.nombre, usuarios.apellido, usuarios.email, usuarios.password, usuarios.type, borrachosPartidos.partidosAnotado, borrachosCuota.estaPago FROM usuarios'
+
+    query +=
+      ' JOIN borrachosPartidos ON usuarios.id = borrachosPartidos.user_id'
+    query +=
+      ' JOIN borrachosCuota ON usuarios.id = borrachosCuota.user_id WHERE usuarios.type=0'
+    const borrachos = (await turso.execute(query)).rows as unknown as Borracho[]
     return borrachos
   }
 

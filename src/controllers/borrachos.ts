@@ -12,8 +12,8 @@ export class BorrachoController {
   getAll = async (req: Request, res: Response) => {
     // TODO Validations here
     try {
-      const partidos = await this.borrachoModel.getAll()
-      res.send({ partidos })
+      const borrachos = await this.borrachoModel.getAll()
+      res.send({ borrachos })
     } catch (err) {
       console.log((err as Error).message)
       res.status(500).send({ error: 'Ocurrio un error en el servidor' })

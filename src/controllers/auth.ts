@@ -15,7 +15,7 @@ export class AuthController {
     const result = validateUsuario(input)
 
     if (result.error) {
-      res.status(400).send({ error: result.error.message })
+      return res.status(400).send({ error: result.error.message })
     }
 
     try {
@@ -33,7 +33,7 @@ export class AuthController {
     const result = validatePartialUsuario({ email, password })
 
     if (result.error) {
-      res.status(400).send({ error: result.error.message })
+      return res.status(400).send({ error: result.error.message })
     }
 
     try {
@@ -48,6 +48,8 @@ export class AuthController {
       res
         .cookie('access-token', token, {
           httpOnly: true,
+          secure: process.env.NODE_ENV === 'production',
+          sameSite: 'none',
         })
         .send({ token, user })
     } catch (err) {

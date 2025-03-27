@@ -14,11 +14,11 @@ export class PartidoModel implements IPartidoModel {
       .rows as unknown as Partido[]
     return partidos
   }
+
   async create({ input }: any): Promise<string> {
     const { fecha, rival, cancha, capacidad } = input
 
     // TODO No puede tener una fecha igual o muy cercana a otra
-
     try {
       const id = (
         await turso.execute({
@@ -79,6 +79,8 @@ export class PartidoModel implements IPartidoModel {
     }
   }
   async delete(id: number): Promise<string> {
+    //Verificar que existe id
+
     try {
       const isDeleted = (
         await turso.execute({

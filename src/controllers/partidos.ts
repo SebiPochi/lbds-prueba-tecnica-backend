@@ -24,8 +24,8 @@ export class PartidoController {
   }
 
   create = async (req: Request, res: Response) => {
-    if (req.session?.user.type == TipoUsuario.BORRACHO) {
-      res.status(403).send({ error: 'No autorizado a esta pagina' })
+    if (req.session?.user?.type == TipoUsuario.BORRACHO) {
+      return res.status(403).send({ error: 'No autorizado a esta pagina' })
     }
 
     const input = req.body
@@ -33,7 +33,7 @@ export class PartidoController {
     const result = validatePartido(input)
 
     if (result.error) {
-      res.status(400).send({ error: result.error.message })
+      return res.status(400).send({ error: result.error.message })
     }
 
     try {
@@ -54,7 +54,7 @@ export class PartidoController {
     const result = validatePartido(input)
 
     if (result.error) {
-      res.status(400).send({ error: result.error.message })
+      return res.status(400).send({ error: result.error.message })
     }
 
     try {

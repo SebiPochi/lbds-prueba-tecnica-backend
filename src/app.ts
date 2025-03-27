@@ -18,20 +18,46 @@ export const createApp = (
   const app = express()
   app.use(express.json())
   app.use(cookieParser())
-  app.use(cors())
+  app.use(
+    cors({
+      origin: 'http://localhost:5173', // El frontend
+      methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'], // Métodos permitidos
+      credentials: true, // Permitir el uso de cookies y credenciales
+    }),
+  )
 
   app.use((req: Request, res: Response, next: NextFunction) => {
-    const token = req.cookies['access-token']
+    let token = req.cookies['access-token']
+    const authHeader = req.headers['authorization']
     let data = null
-
     req.session = { user: null }
+
+    if (req.path === '/login' || req.path === '/register') {
+      return next()
+    }
+
+    if (!token) {
+      if (authHeader != null) {
+        token = authHeader.split(' ')[1] // Desestructuración para obtener el segundo valor (token)
+      }
+      if (!token) {
+        res
+          .status(401)
+          .send({ error: 'El token de inicio de sesión expiró o es nulo' })
+      }
+    }
+
     try {
       data = jwt.verify(token, process.env.SECRET_JWT_KEY!)
       req.session.user = data
+      next()
     } catch (error) {
-      console.log('Error middleware session')
+      if ((error as Error).message === 'jwt expired') {
+        res.status(403).send({ error: 'Debe iniciar sesión nuevamente' })
+      } else {
+        res.status(401).json({ error: 'Token inválido' })
+      }
     }
-    next()
   })
 
   app.use(createPartidoRouter(partidoModel))

@@ -5,6 +5,8 @@ import { Usuario } from '../types/usuario.js'
 export interface IBorrachoModel {
   getAll(): Promise<Borracho[]>
   get({}): Promise<Usuario>
+  getBorracho({}): Promise<Borracho>
   pagarCuota({}): Promise<boolean>
-  anotarsePartido({}): Promise<Partido>
+  anotarsePartido({}): Promise<string[]>
+  getPartidosAnotado({}): Promise<string[]>
 }

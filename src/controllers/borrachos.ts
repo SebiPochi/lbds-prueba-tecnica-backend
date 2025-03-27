@@ -9,6 +9,17 @@ export class BorrachoController {
     this.borrachoModel = borrachoModel
   }
 
+  get = async (req: Request, res: Response) => {
+    const { id } = req.params
+
+    try {
+      const borracho = await this.borrachoModel.getBorracho({ id })
+      res.send({ borracho })
+    } catch (e) {
+      res.status(500).send('Ocurrio un error en el servidor')
+    }
+  }
+
   getAll = async (req: Request, res: Response) => {
     // TODO Validations here
     try {
@@ -21,29 +32,83 @@ export class BorrachoController {
   }
 
   pagarCuota = async (req: Request, res: Response) => {
-    const { id } = req.params
+    const { id } = req.body
 
     const result = validatePartialUsuario({ id })
-
     if (result.error) {
-      res.status(400).send({ error: 'El id no es valido' })
+      return res.status(400).send({ error: 'El id no es valido' })
+    }
+
+    let posibleBorracho
+    // Es borracho?
+    try {
+      posibleBorracho = await this.borrachoModel.get({ id })
+      if (posibleBorracho.type !== TipoUsuario.BORRACHO) {
+        return res.status(403).send({ error: 'El usuario no es borracho' })
+      }
+    } catch (e) {
+      console.log(e)
+      return res.status(500).send({ error: 'Ocurrio un error en el servidor' })
+    }
+
+    try {
+      await this.borrachoModel.pagarCuota({ id })
+      res.send({ message: 'Se ha pagado la cuota correctamente' })
+    } catch (e) {
+      if ((e as Error).message === 'El usuario ya pago la cuota') {
+        return res.status(400).send({ error: (e as Error).message })
+      }
+      res.status(500).send({ error: 'Ocurrio un error en el servidor' })
+    }
+  }
+  anotarsePartido = async (req: Request, res: Response) => {
+    const { borrachoId, partidoId } = req.body
+
+    const result = validatePartialUsuario({ id: borrachoId })
+    if (result.error) {
+      return res.status(400).send({ error: 'El id no es valido' })
     }
 
     // Es borracho?
+    let posibleBorracho
     try {
-      const posibleBorracho = await this.borrachoModel.get({ id })
-      if ((await posibleBorracho).type !== TipoUsuario.BORRACHO) {
-        res.status(403).send({ error: 'El usuario no es borracho' })
+      console.log(borrachoId, partidoId)
+      posibleBorracho = await this.borrachoModel.get({ id: borrachoId })
+      if (posibleBorracho.type !== TipoUsuario.BORRACHO) {
+        return res.status(403).send({ error: 'El usuario no es borracho' })
       }
     } catch (e) {
-      res.status(500).send({ error: 'Ocurrio un error en el servidor' })
+      console.log(e)
+      return res.status(500).send({ error: 'Ocurrio un error en el servidor' })
     }
 
     try {
-      await this.borrachoModel.pagarCuota(id)
+      const partidosAnotado = await this.borrachoModel.anotarsePartido({
+        borrachoId,
+        partidoId,
+      })
+      res.send({ partidosAnotado })
     } catch (e) {
-      console.log((e as Error).message)
-      res.status(500).send({ error: 'Ocurrio un error en el servidor' })
+      if (
+        (e as Error).message === 'El borracho ya está anotado a este partido'
+      ) {
+        return res.status(400).send({ error: (e as Error).message })
+      }
+    }
+  }
+
+  getPartidosAnotado = async (req: Request, res: Response) => {
+    const { id } = req.params
+
+    console.log(id)
+
+    try {
+      const partidosAnotado = await this.borrachoModel.getPartidosAnotado({
+        id,
+      })
+      res.send({ partidosAnotado })
+    } catch (e) {
+      res.status(500).send({ error: (e as Error).message })
     }
   }
 }

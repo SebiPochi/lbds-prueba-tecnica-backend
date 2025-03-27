@@ -33,8 +33,9 @@ export class AuthController {
 
     const result = validatePartialUsuario({ email, password })
 
+    console.log(result.error?.errors[0].message)
     if (result.error) {
-      res.status(400).send({ error: result.error.message })
+      res.status(400).send({ error: result.error?.errors[0].message })
       return
     }
 

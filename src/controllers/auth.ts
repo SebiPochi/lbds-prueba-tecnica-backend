@@ -24,7 +24,7 @@ export class AuthController {
       res.send({ id })
     } catch (err) {
       console.log(`${(err as Error).name}: ${(err as Error).message}`)
-      res.status(500).send('Ocurrio un error en el servidor') // TODO Validacion
+      res.status(500).send({ error: 'Ocurrio un error en el servidor' }) // TODO Validacion
     }
   }
 
@@ -55,7 +55,7 @@ export class AuthController {
         })
         .send({ token, user })
     } catch (err) {
-      res.status(500).send('Ocurrio un error en el servidor')
+      res.status(500).send({ error: 'Ocurrio un error en el servidor' })
     }
   }
 }

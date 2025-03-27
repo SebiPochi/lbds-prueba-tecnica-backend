@@ -9,6 +9,15 @@ export const turso = createClient({
 })
 
 export class PartidoModel implements IPartidoModel {
+  async tieneCapacidad({ id }: any): Promise<boolean> {
+    const res = await turso.execute({
+      sql: 'SELECT capacidad > entradasCompradas AS tieneCapacidad FROM partidos WHERE id = ?',
+      args: [id],
+    })
+
+    return Boolean(res.rows[0].tieneCapacidad)
+  }
+
   async getAll(): Promise<Partido[]> {
     const partidos = (await turso.execute('SELECT * FROM partidos'))
       .rows as unknown as Partido[]

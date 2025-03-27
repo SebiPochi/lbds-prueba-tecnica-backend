@@ -19,13 +19,10 @@ export class PartidoController {
     }
   }
 
-  get = async (req: Request, res: Response) => {
-    const { id } = req.params
-  }
-
   create = async (req: Request, res: Response) => {
     if (req.session?.user?.type == TipoUsuario.BORRACHO) {
-      return res.status(403).send({ error: 'No autorizado a esta pagina' })
+      res.status(403).send({ error: 'No autorizado a esta pagina' })
+      return
     }
 
     const input = req.body
@@ -33,7 +30,8 @@ export class PartidoController {
     const result = validatePartido(input)
 
     if (result.error) {
-      return res.status(400).send({ error: result.error.message })
+      res.status(400).send({ error: result.error.message })
+      return
     }
 
     try {
@@ -54,7 +52,8 @@ export class PartidoController {
     const result = validatePartido(input)
 
     if (result.error) {
-      return res.status(400).send({ error: result.error.message })
+      res.status(400).send({ error: result.error.message })
+      return
     }
 
     try {
@@ -67,6 +66,7 @@ export class PartidoController {
   delete = async (req: Request, res: Response) => {
     if (req.session?.user.type == TipoUsuario.BORRACHO) {
       res.status(403).send({ error: 'No autorizado a esta pagina' })
+      return
     }
 
     const id = Number(req.params.id)

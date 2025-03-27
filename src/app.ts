@@ -62,7 +62,7 @@ export const createApp = (
 
   app.use(createPartidoRouter(partidoModel))
   app.use(createAuthRouter(authModel))
-  app.use(createBorrachoRouter(borrachoModel))
+  app.use(createBorrachoRouter(borrachoModel, partidoModel))
 
   app.listen(PORT, () => {
     console.log(`Running on port: ${PORT}`)

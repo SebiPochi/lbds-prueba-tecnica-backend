@@ -15,7 +15,8 @@ export class AuthController {
     const result = validateUsuario(input)
 
     if (result.error) {
-      return res.status(400).send({ error: result.error.message })
+      res.status(400).send({ error: result.error.message })
+      return
     }
 
     try {
@@ -33,7 +34,8 @@ export class AuthController {
     const result = validatePartialUsuario({ email, password })
 
     if (result.error) {
-      return res.status(400).send({ error: result.error.message })
+      res.status(400).send({ error: result.error.message })
+      return
     }
 
     try {
@@ -53,7 +55,6 @@ export class AuthController {
         })
         .send({ token, user })
     } catch (err) {
-      console.log((err as Error).message)
       res.status(500).send('Ocurrio un error en el servidor')
     }
   }

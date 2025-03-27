@@ -2,11 +2,14 @@ import { Request, Response } from 'express'
 import { IBorrachoModel } from '../interfaces/borracho.js'
 import { validatePartialUsuario } from '../schemas/usuario.js'
 import { TipoUsuario } from '../types/usuario.js'
+import { IPartidoModel } from '../interfaces/partido.js'
 
 export class BorrachoController {
   borrachoModel: IBorrachoModel
-  constructor(borrachoModel: IBorrachoModel) {
+  partidoModel: IPartidoModel
+  constructor(borrachoModel: IBorrachoModel, partidoModel: IPartidoModel) {
     this.borrachoModel = borrachoModel
+    this.partidoModel = partidoModel
   }
 
   get = async (req: Request, res: Response) => {
@@ -36,7 +39,8 @@ export class BorrachoController {
 
     const result = validatePartialUsuario({ id })
     if (result.error) {
-      return res.status(400).send({ error: 'El id no es valido' })
+      res.status(400).send({ error: 'El id no es valido' })
+      return
     }
 
     let posibleBorracho
@@ -44,11 +48,12 @@ export class BorrachoController {
     try {
       posibleBorracho = await this.borrachoModel.get({ id })
       if (posibleBorracho.type !== TipoUsuario.BORRACHO) {
-        return res.status(403).send({ error: 'El usuario no es borracho' })
+        res.status(403).send({ error: 'El usuario no es borracho' })
+        return
       }
     } catch (e) {
       console.log(e)
-      return res.status(500).send({ error: 'Ocurrio un error en el servidor' })
+      res.status(500).send({ error: 'Ocurrio un error en el servidor' })
     }
 
     try {
@@ -56,30 +61,47 @@ export class BorrachoController {
       res.send({ message: 'Se ha pagado la cuota correctamente' })
     } catch (e) {
       if ((e as Error).message === 'El usuario ya pago la cuota') {
-        return res.status(400).send({ error: (e as Error).message })
+        res.status(400).send({ error: (e as Error).message })
+      } else {
+        res.status(500).send({ error: 'Ocurrio un error en el servidor' })
       }
-      res.status(500).send({ error: 'Ocurrio un error en el servidor' })
     }
   }
-  anotarsePartido = async (req: Request, res: Response) => {
+  anotarsePartido = async (req: Request, res: Response): Promise<void> => {
     const { borrachoId, partidoId } = req.body
 
     const result = validatePartialUsuario({ id: borrachoId })
     if (result.error) {
-      return res.status(400).send({ error: 'El id no es valido' })
+      res.status(400).send({ error: 'El id no es valido' })
+      return
     }
 
     // Es borracho?
     let posibleBorracho
     try {
-      console.log(borrachoId, partidoId)
       posibleBorracho = await this.borrachoModel.get({ id: borrachoId })
       if (posibleBorracho.type !== TipoUsuario.BORRACHO) {
-        return res.status(403).send({ error: 'El usuario no es borracho' })
+        res.status(403).send({ error: 'El usuario no es borracho' })
+        return
       }
     } catch (e) {
       console.log(e)
-      return res.status(500).send({ error: 'Ocurrio un error en el servidor' })
+      res.status(500).send({ error: 'Ocurrio un error en el servidor' })
+      return
+    }
+
+    // Hay capcidadad?
+    try {
+      const tieneCapacidad = await this.partidoModel.tieneCapacidad({
+        id: partidoId,
+      })
+      if (!tieneCapacidad) {
+        res.status(400).send({ error: 'La cancha no tiene mas capacidad' })
+        return
+      }
+    } catch (e) {
+      res.status(400).send({ error: 'No hay mas capacidad en la cancha' })
+      return
     }
 
     try {
@@ -92,15 +114,15 @@ export class BorrachoController {
       if (
         (e as Error).message === 'El borracho ya está anotado a este partido'
       ) {
-        return res.status(400).send({ error: (e as Error).message })
+        res.status(400).send({ error: (e as Error).message })
+      } else {
+        res.status(500).send({ error: 'Ocurrio un error en el servidor' })
       }
     }
   }
 
   getPartidosAnotado = async (req: Request, res: Response) => {
     const { id } = req.params
-
-    console.log(id)
 
     try {
       const partidosAnotado = await this.borrachoModel.getPartidosAnotado({

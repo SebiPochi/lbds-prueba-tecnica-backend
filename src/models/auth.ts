@@ -44,15 +44,6 @@ export class AuthModel implements IAuthModel {
       args: [uuid],
     })
 
-    // TODO devolver usuario no id
-    /*
-    const newUser = (
-      await turso.execute({
-        sql: 'SELECT * FROM usuarios WHERE id=?',
-        args: [await id],
-      })
-    ).rows[0] as Usuario
-    */
     return id
   }
 

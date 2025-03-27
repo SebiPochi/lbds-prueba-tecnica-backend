@@ -88,6 +88,12 @@ export class BorrachoModel implements IBorrachoModel {
       args: [JSON.stringify(partidosAnotado), borrachoId],
     })
 
+    // sumar una entradaComprada al partido
+    await turso.execute({
+      sql: 'UPDATE partidos SET entradasCompradas = entradasCompradas + 1 WHERE id = ?',
+      args: [partidoId],
+    })
+
     return partidosAnotado
   }
 
